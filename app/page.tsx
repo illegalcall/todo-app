@@ -126,7 +126,10 @@ export default function Home() {
 
             {editingId === todo.id ? (
               <button
-                onClick={cancelEdit}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  cancelEdit();
+                }}
                 className="text-xs text-gray-500 hover:text-gray-700 shrink-0"
               >
                 Cancel
