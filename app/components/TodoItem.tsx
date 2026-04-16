@@ -1,6 +1,6 @@
 "use client";
 
-import { Todo } from "@/app/types/todo";
+import type { Todo } from "@/app/types/todo";
 import DueDateBadge from "./DueDateBadge";
 
 interface TodoItemProps {

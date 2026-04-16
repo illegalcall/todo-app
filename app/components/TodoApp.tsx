@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Todo } from "@/app/types/todo";
+import { useState, useRef } from "react";
+import type { Todo } from "@/app/types/todo";
 import TodoItem from "./TodoItem";
 
 const STORAGE_KEY = "todos";
@@ -21,15 +21,11 @@ function saveTodos(todos: Todo[]) {
 }
 
 export default function TodoApp() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>(loadTodos);
   const [inputText, setInputText] = useState("");
   const [inputDueDate, setInputDueDate] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setTodos(loadTodos());
-  }, []);
 
   function updateTodos(next: Todo[]) {
     setTodos(next);
