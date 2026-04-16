@@ -2,14 +2,25 @@
 
 import { useState } from "react";
 
+type Todo = {
+  id: string;
+  text: string;
+  completed: boolean;
+};
+
 export default function Home() {
-  const [todos, setTodos] = useState<string[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState("");
 
   function addTodo() {
     const trimmed = input.trim();
     if (!trimmed) return;
-    setTodos((prev) => [...prev, trimmed]);
+    const newTodo: Todo = {
+      id: crypto.randomUUID(),
+      text: trimmed,
+      completed: false,
+    };
+    setTodos((prev) => [...prev, newTodo]);
     setInput("");
   }
 
@@ -38,9 +49,12 @@ export default function Home() {
         <p className="text-gray-500 text-sm">No todos yet. Add one above!</p>
       ) : (
         <ul className="space-y-2">
-          {todos.map((todo, i) => (
-            <li key={i} className="border border-gray-200 rounded px-3 py-2 text-sm text-gray-800">
-              {todo}
+          {todos.map((todo) => (
+            <li
+              key={todo.id}
+              className="border border-gray-200 rounded px-3 py-2 text-sm text-gray-800"
+            >
+              {todo.text}
             </li>
           ))}
         </ul>
