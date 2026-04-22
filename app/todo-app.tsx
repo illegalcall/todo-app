@@ -83,6 +83,22 @@ function getServerSnapshot(): string {
   return "";
 }
 
+// "Is this render happening on the client, after mount?" — false on the
+// server and during initial hydration, flipped to true on the first
+// post-commit re-read. Used to avoid rendering a misleading empty state
+// before we've had a chance to read localStorage.
+function subscribeMount(): () => void {
+  return () => {};
+}
+
+function getMountedSnapshot(): boolean {
+  return true;
+}
+
+function getMountedServerSnapshot(): boolean {
+  return false;
+}
+
 function writeTodos(todos: Todo[]): boolean {
   if (!safeSetItem(STORAGE_KEY, JSON.stringify(todos))) return false;
   notifyListeners();
@@ -94,6 +110,11 @@ export default function TodoApp() {
     subscribe,
     getSnapshot,
     getServerSnapshot,
+  );
+  const mounted = useSyncExternalStore(
+    subscribeMount,
+    getMountedSnapshot,
+    getMountedServerSnapshot,
   );
   const todos = useMemo(() => parseTodos(snapshot), [snapshot]);
   const [input, setInput] = useState("");
@@ -157,7 +178,11 @@ export default function TodoApp() {
         </button>
       </form>
 
-      {todos.length === 0 ? (
+      {!mounted ? (
+        <p className="text-sm text-gray-400" role="status" aria-live="polite">
+          Loading…
+        </p>
+      ) : todos.length === 0 ? (
         <p className="text-gray-500">No todos yet. Add one above.</p>
       ) : (
         <>
