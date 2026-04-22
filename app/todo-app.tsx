@@ -1,6 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 type Todo = {
   id: string;
@@ -8,45 +13,82 @@ type Todo = {
   completed: boolean;
 };
 
-const STORAGE_KEY = "todos";
+const STORAGE_KEY = "todo-app:todos:v1";
 
-function readTodos(): Todo[] {
+function isTodo(value: unknown): value is Todo {
+  if (value === null || typeof value !== "object") return false;
+  return (
+    "id" in value &&
+    typeof (value as { id: unknown }).id === "string" &&
+    "text" in value &&
+    typeof (value as { text: unknown }).text === "string" &&
+    "completed" in value &&
+    typeof (value as { completed: unknown }).completed === "boolean"
+  );
+}
+
+function parseTodos(raw: string | null): Todo[] {
+  if (!raw) return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as Todo[]) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isTodo);
   } catch {
     return [];
   }
+}
+
+const listeners = new Set<() => void>();
+
+function notifyListeners() {
+  listeners.forEach((listener) => listener());
+}
+
+function subscribe(callback: () => void): () => void {
+  listeners.add(callback);
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY || e.key === null) callback();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => {
+    listeners.delete(callback);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function getSnapshot(): string {
+  return localStorage.getItem(STORAGE_KEY) ?? "";
+}
+
+function getServerSnapshot(): string {
+  return "";
 }
 
 function writeTodos(todos: Todo[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
   } catch {
-    // quota exceeded or unavailable — ignore
+    // quota exceeded or storage unavailable — drop the write
+    return;
   }
+  notifyListeners();
 }
 
 export default function TodoApp() {
-  const [todos, setTodosState] = useState<Todo[]>([]);
+  const snapshot = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+  const todos = useMemo(() => parseTodos(snapshot), [snapshot]);
   const [input, setInput] = useState("");
 
-  useEffect(() => {
-    const sync = () => setTodosState(readTodos());
-    sync();
-    window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
-  }, []);
-
+  // Reads current todos directly from storage so mutations never compute
+  // from a stale React state (e.g., before the first post-hydration read).
   const setTodos = useCallback(
     (updater: (prev: Todo[]) => Todo[]) => {
-      setTodosState((prev) => {
-        const next = updater(prev);
-        writeTodos(next);
-        return next;
-      });
+      const current = parseTodos(localStorage.getItem(STORAGE_KEY));
+      writeTodos(updater(current));
     },
     [],
   );
