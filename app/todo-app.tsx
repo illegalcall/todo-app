@@ -56,22 +56,37 @@ function subscribe(callback: () => void): () => void {
   };
 }
 
+function safeGetItem(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    // SecurityError in sandboxed/blocked contexts, storage disabled, etc.
+    return null;
+  }
+}
+
+function safeSetItem(key: string, value: string): boolean {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch {
+    // QuotaExceededError or SecurityError — treat as a failed write
+    return false;
+  }
+}
+
 function getSnapshot(): string {
-  return localStorage.getItem(STORAGE_KEY) ?? "";
+  return safeGetItem(STORAGE_KEY) ?? "";
 }
 
 function getServerSnapshot(): string {
   return "";
 }
 
-function writeTodos(todos: Todo[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-  } catch {
-    // quota exceeded or storage unavailable — drop the write
-    return;
-  }
+function writeTodos(todos: Todo[]): boolean {
+  if (!safeSetItem(STORAGE_KEY, JSON.stringify(todos))) return false;
   notifyListeners();
+  return true;
 }
 
 export default function TodoApp() {
@@ -85,10 +100,12 @@ export default function TodoApp() {
 
   // Reads current todos directly from storage so mutations never compute
   // from a stale React state (e.g., before the first post-hydration read).
+  // Returns false when the persist step fails so callers can preserve
+  // user input instead of silently discarding it.
   const setTodos = useCallback(
-    (updater: (prev: Todo[]) => Todo[]) => {
-      const current = parseTodos(localStorage.getItem(STORAGE_KEY));
-      writeTodos(updater(current));
+    (updater: (prev: Todo[]) => Todo[]): boolean => {
+      const current = parseTodos(safeGetItem(STORAGE_KEY));
+      return writeTodos(updater(current));
     },
     [],
   );
@@ -99,11 +116,11 @@ export default function TodoApp() {
     e.preventDefault();
     const text = input.trim();
     if (!text) return;
-    setTodos((prev) => [
+    const saved = setTodos((prev) => [
       ...prev,
       { id: crypto.randomUUID(), text, completed: false },
     ]);
-    setInput("");
+    if (saved) setInput("");
   };
 
   const toggleTodo = (id: string) => {
