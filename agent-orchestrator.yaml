@@ -10,7 +10,7 @@ defaults:
 projects:
   todo-app:
     repo: illegalcall/todo-app
-    path: /Users/dhruvthg/todo-app
+    path: /Users/dhruvsharma/Development/todo-app
     defaultBranch: main
     agentRules: >-
       Always run tests before pushing.
@@ -73,3 +73,17 @@ projects:
       - npm run typecheck
 
       - npm run lint
+    codeReview:
+      plugin: codex
+      mode: enabled
+      severityThreshold: info
+      trigger:
+        onPullRequestOpen: true
+        onPullRequestUpdate: true
+        manual: true
+      routing:
+        autoSendNewFindingsToAgent: true
+        publishToScm: false
+      limits:
+        maxReviewRounds: 3
+        stallWindow: 3
