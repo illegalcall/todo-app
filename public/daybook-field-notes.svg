@@ -1,0 +1,130 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1200"
+  height="630"
+  viewBox="0 0 1200 630"
+  fill="none"
+  role="img"
+  aria-labelledby="daybook-title daybook-description"
+>
+  <title id="daybook-title">A quiet day unfolding from an open notebook</title>
+  <desc id="daybook-description">
+    An open daybook rests in a calm landscape while a checked task becomes a
+    winding path toward the morning sun.
+  </desc>
+
+  <defs>
+    <linearGradient id="sky" x1="204" y1="34" x2="1018" y2="617" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FAF5E8" />
+      <stop offset=".48" stop-color="#DCEBE3" />
+      <stop offset="1" stop-color="#B9D5D2" />
+    </linearGradient>
+    <linearGradient id="sun" x1="867" y1="93" x2="916" y2="225" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD89A" />
+      <stop offset="1" stop-color="#EE9B68" />
+    </linearGradient>
+    <linearGradient id="hill" x1="338" y1="333" x2="978" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#98B8A8" />
+      <stop offset="1" stop-color="#315F59" />
+    </linearGradient>
+    <linearGradient id="paper" x1="357" y1="293" x2="770" y2="572" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDF8" />
+      <stop offset="1" stop-color="#EEE6D4" />
+    </linearGradient>
+    <linearGradient id="page-edge" x1="573" y1="288" x2="604" y2="565" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E5D9C2" stop-opacity=".2" />
+      <stop offset=".55" stop-color="#AA9677" stop-opacity=".72" />
+      <stop offset="1" stop-color="#F7F0E2" stop-opacity=".15" />
+    </linearGradient>
+    <filter id="shadow" x="256" y="232" width="701" height="391" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#1E403C" flood-opacity=".18" />
+    </filter>
+    <clipPath id="frame">
+      <rect x="24" y="24" width="1152" height="582" rx="42" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect x="24" y="24" width="1152" height="582" rx="42" fill="url(#sky)" />
+
+    <path
+      d="M36 450C143 396 228 410 320 449C409 487 466 455 545 408C646 348 732 346 828 404C930 466 1031 441 1176 367V606H24L36 450Z"
+      fill="#BFD4BF"
+    />
+    <path
+      d="M24 512C157 431 252 450 365 509C451 554 543 527 631 470C731 406 817 406 898 460C982 517 1070 501 1176 427V606H24V512Z"
+      fill="url(#hill)"
+    />
+
+    <circle cx="896" cy="153" r="67" fill="url(#sun)" />
+    <circle cx="896" cy="153" r="87" stroke="#FFF7DC" stroke-opacity=".5" stroke-width="2" />
+    <path d="M896 50V24M896 282V257M793 153H766M1026 153H999M824 81L805 62M988 245L969 226M968 80L987 61" stroke="#FFF8E5" stroke-width="5" stroke-linecap="round" opacity=".75" />
+
+    <path d="M113 151C148 120 184 120 218 151C247 177 274 174 310 143" stroke="#FFFDF4" stroke-width="13" stroke-linecap="round" opacity=".75" />
+    <path d="M127 190C155 165 185 165 212 190" stroke="#FFFDF4" stroke-width="8" stroke-linecap="round" opacity=".52" />
+    <path d="M1028 264C1050 244 1072 244 1094 264C1112 281 1131 280 1154 260" stroke="#EAF3EA" stroke-width="9" stroke-linecap="round" opacity=".62" />
+
+    <path
+      d="M625 494C701 433 715 363 754 323C779 298 815 292 844 306C872 319 876 346 861 365C844 388 811 384 799 361"
+      stroke="#F5D7A7"
+      stroke-width="17"
+      stroke-linecap="round"
+    />
+    <path
+      d="M625 494C701 433 715 363 754 323C779 298 815 292 844 306C872 319 876 346 861 365C844 388 811 384 799 361"
+      stroke="#FFF9E9"
+      stroke-width="5"
+      stroke-linecap="round"
+      stroke-dasharray="2 20"
+    />
+
+    <g opacity=".95">
+      <path d="M787 304C770 273 774 247 804 226C817 261 810 287 787 304Z" fill="#6D9480" />
+      <path d="M801 295C828 274 853 276 874 301C844 315 820 309 801 295Z" fill="#4F7A6A" />
+      <path d="M785 306C801 281 818 263 841 246" stroke="#315F59" stroke-width="3" stroke-linecap="round" />
+    </g>
+
+    <g filter="url(#shadow)">
+      <path
+        d="M276 329C372 279 477 276 589 317V570C473 536 371 541 276 585V329Z"
+        fill="url(#paper)"
+        stroke="#D9CCB5"
+        stroke-width="2"
+      />
+      <path
+        d="M589 317C699 273 807 281 916 335V586C807 539 699 535 589 570V317Z"
+        fill="url(#paper)"
+        stroke="#D9CCB5"
+        stroke-width="2"
+      />
+      <path d="M589 319V568" stroke="url(#page-edge)" stroke-width="13" />
+      <path d="M588 323C576 418 577 499 588 566" stroke="#FFFDF8" stroke-width="3" opacity=".8" />
+
+      <path d="M323 377C391 349 462 347 533 365" stroke="#D8CDBA" stroke-width="4" stroke-linecap="round" />
+      <path d="M323 411C391 385 462 384 533 400" stroke="#E2D8C7" stroke-width="3" stroke-linecap="round" />
+      <path d="M323 457C389 435 459 433 526 448" stroke="#E2D8C7" stroke-width="3" stroke-linecap="round" />
+      <path d="M323 503C386 483 449 482 505 492" stroke="#E2D8C7" stroke-width="3" stroke-linecap="round" />
+
+      <circle cx="331" cy="410" r="12" fill="#DDE9DF" stroke="#547866" stroke-width="3" />
+      <path d="M325 410L330 415L339 404" stroke="#315F59" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="331" cy="456" r="12" fill="#FFFDF8" stroke="#A8A08E" stroke-width="3" />
+      <circle cx="331" cy="502" r="12" fill="#FFFDF8" stroke="#A8A08E" stroke-width="3" />
+
+      <path d="M634 374C694 349 764 349 841 376" stroke="#D8CDBA" stroke-width="4" stroke-linecap="round" />
+      <path d="M634 415C697 392 763 393 852 423" stroke="#E2D8C7" stroke-width="3" stroke-linecap="round" />
+      <path d="M634 458C699 438 763 440 828 459" stroke="#E2D8C7" stroke-width="3" stroke-linecap="round" />
+      <path d="M634 500C695 482 750 483 801 496" stroke="#E2D8C7" stroke-width="3" stroke-linecap="round" />
+
+      <path d="M834 516C848 495 865 483 885 478C879 500 864 516 834 516Z" fill="#789C87" />
+      <path d="M832 516C819 494 801 481 781 477C787 500 803 515 832 516Z" fill="#A6BEA4" />
+      <path d="M833 516V542" stroke="#4D7768" stroke-width="4" stroke-linecap="round" />
+    </g>
+
+    <path d="M117 531C155 501 190 498 224 520" stroke="#E7C79B" stroke-width="7" stroke-linecap="round" opacity=".85" />
+    <circle cx="1055" cy="473" r="8" fill="#F6D2A4" />
+    <circle cx="1090" cy="504" r="5" fill="#F6D2A4" opacity=".72" />
+    <circle cx="1019" cy="514" r="4" fill="#F6D2A4" opacity=".6" />
+  </g>
+
+  <rect x="24" y="24" width="1152" height="582" rx="42" stroke="#315F59" stroke-opacity=".16" stroke-width="2" />
+</svg>

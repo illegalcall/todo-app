@@ -11,22 +11,22 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   const labelId = `todo-label-${todo.id}`;
 
   return (
-    <li className="flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <li className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 shadow-sm">
       <input
         id={`todo-${todo.id}`}
         type="checkbox"
         checked={todo.completed}
         onChange={() => onToggle(todo.id)}
         aria-labelledby={labelId}
-        className="h-5 w-5 shrink-0 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+        className="h-5 w-5 shrink-0 cursor-pointer rounded border-[var(--line-strong)] accent-[var(--accent-strong)] focus:ring-2 focus:ring-[var(--accent)]"
       />
       <label
         id={labelId}
         htmlFor={`todo-${todo.id}`}
         className={`flex-1 cursor-pointer text-sm ${
           todo.completed
-            ? "text-gray-400 line-through dark:text-gray-500"
-            : "text-gray-900 dark:text-gray-100"
+            ? "text-[var(--muted)] line-through"
+            : "text-[var(--ink)]"
         }`}
       >
         {todo.title}
@@ -35,7 +35,7 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
         type="button"
         onClick={() => onDelete(todo.id)}
         aria-label={`Delete "${todo.title}"`}
-        className="shrink-0 rounded p-1 text-gray-400 transition-colors hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 dark:hover:text-red-400"
+        className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-[var(--muted)] transition-colors hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
