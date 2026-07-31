@@ -1,4 +1,3 @@
-// #105 — TodoList component
 import type { Todo } from "@/types/todo";
 import TodoItem from "./TodoItem";
 
@@ -6,25 +5,42 @@ interface TodoListProps {
   todos: Todo[];
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onUpdate: (
+    id: string,
+    patch: Partial<Pick<Todo, "title" | "priority" | "dueTime">>,
+  ) => void;
+  onFocus: (id: string) => void;
+  focusedId: string | null;
 }
 
-export default function TodoList({ todos, onToggle, onDelete }: TodoListProps) {
+export default function TodoList({
+  todos,
+  onToggle,
+  onDelete,
+  onUpdate,
+  onFocus,
+  focusedId,
+}: TodoListProps) {
   if (todos.length === 0) {
     return (
-      <p className="rounded-md border border-dashed border-gray-300 px-3 py-6 text-center text-sm text-gray-500 dark:border-gray-600 dark:text-gray-400">
-        No todos yet. Add one above to get started.
+      <p className="empty-state">
+        Your orbit is clear. Add something that matters.
       </p>
     );
   }
 
   return (
-    <ul className="flex flex-col gap-2" aria-label="Todo list">
-      {todos.map((todo) => (
+    <ul className="todo-list" aria-label="Todo list">
+      {todos.map((todo, index) => (
         <TodoItem
           key={todo.id}
           todo={todo}
           onToggle={onToggle}
           onDelete={onDelete}
+          onUpdate={onUpdate}
+          onFocus={onFocus}
+          isFocused={focusedId === todo.id}
+          enterDelay={index * 40}
         />
       ))}
     </ul>
