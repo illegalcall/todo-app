@@ -1,71 +1,113 @@
-// #107 — Main page wiring with state management
-// #108 — Todo deletion  |  #109 — Todo count summary
 "use client";
 
-import { useState } from "react";
-import type { Todo } from "@/types/todo";
-import { sampleTodos } from "@/types/todo";
+import { useEffect, useMemo, useState } from "react";
+import AmbientBackground from "@/components/AmbientBackground";
+import DayOrbit from "@/components/DayOrbit";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
+import FilterTabs from "@/components/FilterTabs";
+import FocusSession from "@/components/FocusSession";
+import { getDayContext } from "@/lib/day";
+import { useTodos } from "@/hooks/useTodos";
 
 export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+  const {
+    todos,
+    visibleTodos,
+    filter,
+    setFilter,
+    addTodo,
+    toggleTodo,
+    deleteTodo,
+    updateTodo,
+    clearCompleted,
+    activeCount,
+    completedCount,
+    progress,
+  } = useTodos();
 
-  function handleAdd(title: string) {
-    setTodos((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), title, completed: false },
-    ]);
+  const [now, setNow] = useState(() => new Date());
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const day = useMemo(() => getDayContext(now), [now]);
+  const focusedTodo = todos.find((todo) => todo.id === focusedId) ?? null;
+
+  function handleFocusComplete() {
+    if (!focusedId) return;
+    toggleTodo(focusedId);
+    setFocusedId(null);
+    setCelebrate(true);
+    window.setTimeout(() => setCelebrate(false), 2200);
   }
-
-  function handleToggle(id: string) {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
-      ),
-    );
-  }
-
-  function handleDelete(id: string) {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-  }
-
-  // #109 — count summary
-  const activeCount = todos.filter((todo) => !todo.completed).length;
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Daybook
-        </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Keep track of what needs doing today.
-        </p>
-      </header>
+    <main className="shell">
+      <AmbientBackground phase={day.phase} />
 
-      <div className="mb-6">
-        <AddTodo onAdd={handleAdd} />
-      </div>
-
-      <TodoList
-        todos={todos}
-        onToggle={handleToggle}
-        onDelete={handleDelete}
+      <DayOrbit
+        progress={progress}
+        hourProgress={day.hourProgress}
+        activeCount={activeCount}
+        completedCount={completedCount}
+        greeting={day.greeting}
+        dateLabel={day.dateLabel}
       />
 
-      <p
-        className="mt-6 text-sm text-gray-500 dark:text-gray-400"
-        aria-live="polite"
-      >
-        {activeCount} active
-        {todos.length > 0 && (
-          <span className="text-gray-400 dark:text-gray-500">
-            {" "}
-            &middot; {todos.length} total
-          </span>
-        )}
-      </p>
+      <section className="workspace" aria-label="Tasks">
+        <AddTodo onAdd={addTodo} />
+
+        <div className="workspace__toolbar">
+          <FilterTabs
+            value={filter}
+            onChange={setFilter}
+            counts={{
+              all: todos.length,
+              active: activeCount,
+              completed: completedCount,
+            }}
+          />
+          {completedCount > 0 && (
+            <button type="button" className="btn btn--ghost btn--sm" onClick={clearCompleted}>
+              Clear done
+            </button>
+          )}
+        </div>
+
+        <TodoList
+          todos={visibleTodos}
+          onToggle={toggleTodo}
+          onDelete={deleteTodo}
+          onUpdate={updateTodo}
+          onFocus={setFocusedId}
+          focusedId={focusedId}
+        />
+
+        <p className="hint" aria-live="polite">
+          Double-click a task to rename · Focus starts a 25-minute orbit
+        </p>
+      </section>
+
+      {focusedTodo && (
+        <div className="focus-overlay">
+          <FocusSession
+            title={focusedTodo.title}
+            onComplete={handleFocusComplete}
+            onExit={() => setFocusedId(null)}
+          />
+        </div>
+      )}
+
+      {celebrate && (
+        <div className="celebrate" role="status">
+          Orbit complete — task marked done
+        </div>
+      )}
     </main>
   );
 }
