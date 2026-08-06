@@ -66,6 +66,10 @@ export default function Home() {
           </span>
         )}
       </p>
+
+      <footer className="mt-10 border-t border-gray-200 pt-4 text-center text-xs text-gray-500 dark:border-gray-800 dark:text-gray-400">
+        <p className="text-pretty">QA chat path verified</p>
+      </footer>
     </main>
   );
 }
