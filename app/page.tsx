@@ -12,6 +12,7 @@ export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(sampleTodos);
 
   function handleAdd(title: string) {
+    console.log("Adding todo:", title);
     setTodos((prev) => [
       ...prev,
       { id: crypto.randomUUID(), title, completed: false },
