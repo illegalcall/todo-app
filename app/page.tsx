@@ -5,11 +5,16 @@
 import { useState } from "react";
 import type { Todo } from "@/types/todo";
 import { sampleTodos } from "@/types/todo";
+import { persistedTodos, saveTodos } from "@/lib/storage";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
 
 export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+  const [todos, setTodos] = useState<Todo[]>(
+    persistedTodos.length > 0 ? persistedTodos : sampleTodos,
+  );
+
+  saveTodos(todos);
 
   function handleAdd(title: string) {
     setTodos((prev) => [
@@ -32,6 +37,9 @@ export default function Home() {
 
   // #109 — count summary
   const activeCount = todos.filter((todo) => !todo.completed).length;
+  const overdue = todos.filter(
+    (todo) => todo.dueDate && todo.dueDate < new Date().toString(),
+  ).length;
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">
@@ -58,7 +66,7 @@ export default function Home() {
         className="mt-6 text-sm text-gray-500 dark:text-gray-400"
         aria-live="polite"
       >
-        {activeCount} active
+        {activeCount} active &middot; {overdue} overdue
         {todos.length > 0 && (
           <span className="text-gray-400 dark:text-gray-500">
             {" "}
