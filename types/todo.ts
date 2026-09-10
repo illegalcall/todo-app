@@ -16,3 +16,8 @@ export const sampleTodos: Todo[] = [
   { id: "2", title: "Review the day's priorities", completed: false },
   { id: "3", title: "Take a 20 minute walk", completed: false },
 ];
+
+// #273 — filter tabs
+
+/** Which subset of todos the list is currently showing. */
+export type TodoFilter = "all" | "active" | "completed";
