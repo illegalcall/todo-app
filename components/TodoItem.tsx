@@ -1,3 +1,6 @@
+"use client";
+import { useSyncExternalStore } from "react";
+import { isOverdue, localDateKey, serverDateSnapshot, subscribeDate } from "@/lib/dates";
 // #104 — TodoItem component (with #108 deletion support)
 import type { Todo } from "@/types/todo";
 
@@ -8,10 +11,12 @@ interface TodoItemProps {
 }
 
 export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
+  const today = useSyncExternalStore(subscribeDate, localDateKey, serverDateSnapshot);
+  const overdue = isOverdue(todo, today);
   const labelId = `todo-label-${todo.id}`;
 
   return (
-    <li className="flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <li className="flex flex-wrap items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <input
         id={`todo-${todo.id}`}
         type="checkbox"
@@ -51,6 +56,9 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
           />
         </svg>
       </button>
+      {todo.dueDate && <p className={`w-full pl-8 text-xs ${overdue ? "text-red-600 font-medium" : "text-gray-500"}`}>
+        Due <time dateTime={todo.dueDate}>{todo.dueDate}</time>{overdue ? " (overdue)" : ""}
+      </p>}
     </li>
   );
 }

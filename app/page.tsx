@@ -11,11 +11,12 @@ import TodoList from "@/components/TodoList";
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(sampleTodos);
 
-  function handleAdd(title: string) {
+  function handleAdd(title: string, dueDate?: string): boolean {
     setTodos((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), title, completed: false },
+      { id: crypto.randomUUID(), title, completed: false, ...(dueDate ? { dueDate } : {}) },
     ]);
+    return true;
   }
 
   function handleToggle(id: string) {

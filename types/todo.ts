@@ -8,6 +8,8 @@ export interface Todo {
   title: string;
   /** Whether the task has been completed. */
   completed: boolean;
+  /** Optional local-calendar due date in YYYY-MM-DD format. */
+  dueDate?: string;
 }
 
 /** Seed data used to populate the list on first render. */
