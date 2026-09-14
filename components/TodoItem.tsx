@@ -1,14 +1,20 @@
 // #104 — TodoItem component (with #108 deletion support)
+"use client";
+
+import { useRef, useState } from "react";
 import type { Todo } from "@/types/todo";
 
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onTagsChange: (id: string, tags: string[]) => void;
 }
 
-export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
+export default function TodoItem({ todo, onToggle, onDelete, onTagsChange }: TodoItemProps) {
   const labelId = `todo-label-${todo.id}`;
+  const [newTag, setNewTag] = useState("");
+  const tagSummary = useRef<HTMLElement>(null);
 
   return (
     <li className="flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -20,7 +26,8 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
         aria-labelledby={labelId}
         className="h-5 w-5 shrink-0 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
       />
-      <label
+      <div className="min-w-0 flex-1">
+        <label
         id={labelId}
         htmlFor={`todo-${todo.id}`}
         className={`flex-1 cursor-pointer text-sm ${
@@ -31,6 +38,28 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
       >
         {todo.title}
       </label>
+        {(todo.tags?.length ?? 0) > 0 && <ul aria-label={`Tags for "${todo.title}"`} className="mt-2 flex flex-wrap gap-1">
+          {todo.tags?.map((tag) => <li key={tag.toLowerCase()} className="flex max-w-full items-center gap-1 rounded bg-blue-50 px-2 py-1 text-xs text-blue-700 dark:bg-blue-950 dark:text-blue-200">
+            <span className="break-all">{tag}</span>
+            <button type="button" aria-label={`Remove tag "${tag}" from "${todo.title}"`} onClick={() => {
+              onTagsChange(todo.id, todo.tags?.filter((value) => value !== tag) ?? []);
+              requestAnimationFrame(() => tagSummary.current?.focus());
+            }} className="shrink-0 rounded px-1 focus:outline-none focus:ring-2 focus:ring-blue-500">×</button>
+          </li>)}
+        </ul>}
+        <details className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <summary ref={tagSummary} className="cursor-pointer rounded focus:outline-none focus:ring-2 focus:ring-blue-500">Edit tags</summary>
+          <form className="mt-2 flex gap-2" onSubmit={(event) => {
+            event.preventDefault();
+            if (!newTag.trim()) return;
+            onTagsChange(todo.id, [...(todo.tags ?? []), newTag]);
+            setNewTag("");
+          }}>
+            <input aria-label={`Add tag to "${todo.title}"`} value={newTag} onChange={(event) => setNewTag(event.target.value)} placeholder="Tag name" className="min-w-0 flex-1 rounded border border-gray-300 bg-white px-2 py-1 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" />
+            <button type="submit" disabled={!newTag.trim()} className="shrink-0 rounded px-2 py-1 text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:text-blue-400">Add tag</button>
+          </form>
+        </details>
+      </div>
       <button
         type="button"
         onClick={() => onDelete(todo.id)}
