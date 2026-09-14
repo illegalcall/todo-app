@@ -3,14 +3,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import type { Todo } from "@/types/todo";
-import { sampleTodos } from "@/types/todo";
+import { useTodos } from "@/components/TodoProvider";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
 
 export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+  const [todos, setTodos] = useTodos();
 
   function handleAdd(title: string) {
     setTodos((prev) => [

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
+import { TodoProvider } from "@/components/TodoProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,7 +47,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <SiteHeader />
-        {children}
+        <TodoProvider>{children}</TodoProvider>
         <footer className="mt-auto border-t border-[var(--line)]">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-5 py-7 text-xs leading-5 text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <p>Daybook · Make a little room for what matters.</p>
