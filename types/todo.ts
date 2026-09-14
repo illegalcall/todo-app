@@ -8,6 +8,8 @@ export interface Todo {
   title: string;
   /** Whether the task has been completed. */
   completed: boolean;
+  /** Optional user-defined categories. */
+  tags?: string[];
 }
 
 /** Seed data used to populate the list on first render. */
