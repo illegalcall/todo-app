@@ -7,6 +7,7 @@ import type { Todo } from "@/types/todo";
 import { sampleTodos } from "@/types/todo";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(sampleTodos);
@@ -35,13 +36,16 @@ export default function Home() {
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">
-      <header className="mb-6">
+      <header className="mb-6 flex items-start justify-between gap-4">
+        <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
           Daybook
         </h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Keep track of what needs doing today.
         </p>
+        </div>
+        <ThemeToggle />
       </header>
 
       <div className="mb-6">

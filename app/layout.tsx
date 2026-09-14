@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   description: "A simple todo app to track what needs doing today.",
 };
 
+// Runs in the document head before the body can paint. Storage denial still
+// falls back to the system preference, and unknown stored values are ignored.
+const themeInitScript = `(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d)})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,7 +30,11 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script id="theme-init" dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
