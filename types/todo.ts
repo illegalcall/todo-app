@@ -8,6 +8,8 @@ export interface Todo {
   title: string;
   /** Whether the task has been completed. */
   completed: boolean;
+  /** Optional local-calendar due date in YYYY-MM-DD format. */
+  dueDate?: string;
 }
 
 /** Seed data used to populate the list on first render. */
@@ -16,3 +18,5 @@ export const sampleTodos: Todo[] = [
   { id: "2", title: "Review the day's priorities", completed: false },
   { id: "3", title: "Take a 20 minute walk", completed: false },
 ];
+
+export type TodoFilter = "all" | "active" | "completed";

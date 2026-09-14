@@ -1,3 +1,6 @@
+"use client";
+import { useRef } from "react";
+import DueDateBadge from "./DueDateBadge";
 // #104 — TodoItem component (with #108 deletion support)
 import type { Todo } from "@/types/todo";
 
@@ -5,13 +8,15 @@ interface TodoItemProps {
   todo: Todo;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onUpdateDueDate: (id: string, dueDate?: string) => boolean;
 }
 
-export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
+export default function TodoItem({ todo, onToggle, onDelete, onUpdateDueDate }: TodoItemProps) {
+  const dateInput = useRef<HTMLInputElement>(null);
   const labelId = `todo-label-${todo.id}`;
 
   return (
-    <li className="flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <li className="flex flex-wrap items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <input
         id={`todo-${todo.id}`}
         type="checkbox"
@@ -51,6 +56,18 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
           />
         </svg>
       </button>
+      <div className="flex w-full flex-wrap items-center gap-2 pl-8 text-xs">
+        {todo.dueDate && <DueDateBadge dueDate={todo.dueDate} completed={todo.completed} />}
+        <label className="flex items-center gap-2">
+          Due date<span className="sr-only"> for {todo.title}</span>
+          <input ref={dateInput} type="date" max="9999-12-31" value={todo.dueDate ?? ""}
+            onChange={event => onUpdateDueDate(todo.id, event.target.value || undefined)}
+            className="min-w-0 rounded border border-gray-300 bg-white p-1.5 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" />
+        </label>
+        {todo.dueDate && <button type="button" onClick={() => {
+          if (onUpdateDueDate(todo.id, undefined)) dateInput.current?.focus();
+        }} aria-label={`Remove due date for ${todo.title}`} className="rounded px-2 py-1 text-gray-600 focus-visible:outline-2 dark:text-gray-300">Remove date</button>}
+      </div>
     </li>
   );
 }
