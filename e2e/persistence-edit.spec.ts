@@ -51,3 +51,25 @@ test("empty persistence and the active title survive a reload", async ({ page })
   await expect(page.getByRole("listitem")).toHaveCount(0);
   await expect(page).toHaveTitle("(0) Todos");
 });
+
+
+for (const change of ["delete", "complete"] as const) {
+  test(`another tab can ${change} a failed editor without blocking filters`, async ({ page, context }) => {
+    await page.getByRole("tab", { name: /^Active/ }).click();
+    await page.getByRole("button", { name: 'Edit "Take a 20 minute walk"' }).click();
+    const editor = page.getByRole("textbox", { name: 'Edit "Take a 20 minute walk"' });
+    await editor.fill("Unsaved other-tab draft");
+    await page.evaluate(() => Reflect.set(window, "denyWrites", true));
+    await page.getByRole("heading", { name: "Daybook" }).click();
+    await expect(page.getByText("Could not save your changes.", { exact: false })).toBeVisible();
+    const other = await context.newPage();
+    await other.goto("/");
+    const row = other.getByRole("listitem").filter({ hasText: "Take a 20 minute walk" });
+    if (change === "delete") await row.getByRole("button", { name: /^Delete/ }).click();
+    else await row.getByRole("checkbox").check();
+    await expect(editor).toHaveCount(0);
+    await page.getByRole("tab", { name: /^Completed/ }).click();
+    await expect(page.getByRole("tab", { name: /^Completed/ })).toHaveAttribute("aria-selected", "true");
+    await other.close();
+  });
+}

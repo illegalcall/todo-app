@@ -70,6 +70,12 @@ export default function Home() {
   // #109 — count summary
   const activeCount = todos.filter((todo) => !todo.completed).length;
 
+  useEffect(() => {
+    const visible = new Set(todos.filter(todo => filter === "all" ||
+      (filter === "completed" ? todo.completed : !todo.completed)).map(todo => todo.id));
+    for (const id of failedEdits.current) if (!visible.has(id)) failedEdits.current.delete(id);
+  }, [todos, filter]);
+
   useEffect(() => { document.title = `(${activeCount}) Todos`; }, [activeCount]);
 
   return (
