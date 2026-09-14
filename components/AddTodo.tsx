@@ -4,7 +4,7 @@
 import { useState } from "react";
 
 interface AddTodoProps {
-  onAdd: (title: string) => void;
+  onAdd: (title: string) => boolean;
 }
 
 export default function AddTodo({ onAdd }: AddTodoProps) {
@@ -14,8 +14,7 @@ export default function AddTodo({ onAdd }: AddTodoProps) {
     event.preventDefault();
     const trimmed = title.trim();
     if (!trimmed) return;
-    onAdd(trimmed);
-    setTitle("");
+    if (onAdd(trimmed)) setTitle("");
   }
 
   return (
