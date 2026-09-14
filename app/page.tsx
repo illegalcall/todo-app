@@ -1,53 +1,75 @@
+// #107 — Main page wiring with state management
+// #108 — Todo deletion  |  #109 — Todo count summary
 "use client";
 
 import { useEffect, useState } from "react";
-
-type Todo = {
-  id: number;
-  text: string;
-  completed: boolean;
-};
+import type { Todo } from "@/types/todo";
+import { sampleTodos } from "@/types/todo";
+import AddTodo from "@/components/AddTodo";
+import TodoList from "@/components/TodoList";
 
 export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: "Buy groceries", completed: false },
-    { id: 2, text: "Write blog post", completed: false },
-    { id: 3, text: "Read a book", completed: true },
-  ]);
+  const [todos, setTodos] = useState<Todo[]>(sampleTodos);
 
-  const incompleteCount = todos.filter((t) => !t.completed).length;
+  function handleAdd(title: string) {
+    setTodos((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), title, completed: false },
+    ]);
+  }
+
+  function handleToggle(id: string) {
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
+  }
+
+  function handleDelete(id: string) {
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+  }
+
+  // #109 — count summary
+  const activeCount = todos.filter((todo) => !todo.completed).length;
 
   useEffect(() => {
-    document.title = `(${incompleteCount}) Todos`;
-  }, [incompleteCount]);
-
-  const toggleTodo = (id: number) => {
-    setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
-  };
+    document.title = `(${activeCount}) Todos`;
+  }, [activeCount]);
 
   return (
-    <main className="min-h-screen bg-white p-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">Todo List</h1>
-      <ul className="space-y-2">
-        {todos.map((todo) => (
-          <li key={todo.id} className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={todo.completed}
-              onChange={() => toggleTodo(todo.id)}
-            />
-            <span
-              className={
-                todo.completed ? "line-through text-gray-400" : "text-gray-900"
-              }
-            >
-              {todo.text}
-            </span>
-          </li>
-        ))}
-      </ul>
+    <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          Daybook
+        </h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Keep track of what needs doing today.
+        </p>
+      </header>
+
+      <div className="mb-6">
+        <AddTodo onAdd={handleAdd} />
+      </div>
+
+      <TodoList
+        todos={todos}
+        onToggle={handleToggle}
+        onDelete={handleDelete}
+      />
+
+      <p
+        className="mt-6 text-sm text-gray-500 dark:text-gray-400"
+        aria-live="polite"
+      >
+        {activeCount} active
+        {todos.length > 0 && (
+          <span className="text-gray-400 dark:text-gray-500">
+            {" "}
+            &middot; {todos.length} total
+          </span>
+        )}
+      </p>
     </main>
   );
 }
