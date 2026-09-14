@@ -1,4 +1,4 @@
-import type { Priority } from "../types/todo";
+import type { Priority } from "@/types/todo";
 
 const priorityConfig: Record<Priority, { label: string; className: string }> = {
   low: {
