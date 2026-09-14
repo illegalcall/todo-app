@@ -2,24 +2,32 @@
 // #108 — Todo deletion  |  #109 — Todo count summary
 "use client";
 
-import { useState } from "react";
-import type { Todo } from "@/types/todo";
-import { sampleTodos } from "@/types/todo";
+import { useMemo, useState, useSyncExternalStore } from "react";
+import type { Todo, Priority } from "@/types/todo";
+import { loadTodos, parseTodos, readTodosSnapshot, saveTodos, serverTodosSnapshot, subscribeTodos } from "@/lib/storage";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
 
 export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+  const snapshot = useSyncExternalStore(subscribeTodos, readTodosSnapshot, serverTodosSnapshot);
+  const todos = useMemo(() => parseTodos(snapshot), [snapshot]);
+  const [saveError, setSaveError] = useState(false);
 
-  function handleAdd(title: string) {
-    setTodos((prev) => [
+  function updateTodos(update: (previous: Todo[]) => Todo[]): boolean {
+    const saved = saveTodos(update(loadTodos()));
+    setSaveError(!saved);
+    return saved;
+  }
+
+  function handleAdd(title: string, priority: Priority): boolean {
+    return updateTodos((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), title, completed: false },
+      { id: crypto.randomUUID(), title, completed: false, priority },
     ]);
   }
 
   function handleToggle(id: string) {
-    setTodos((prev) =>
+    updateTodos((prev) =>
       prev.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo,
       ),
@@ -27,7 +35,7 @@ export default function Home() {
   }
 
   function handleDelete(id: string) {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    updateTodos((prev) => prev.filter((todo) => todo.id !== id));
   }
 
   // #109 — count summary
@@ -47,6 +55,10 @@ export default function Home() {
       <div className="mb-6">
         <AddTodo onAdd={handleAdd} />
       </div>
+
+      {saveError && <p role="alert" className="mb-4 text-sm text-red-600">
+        Could not save your changes. Check browser storage and try again.
+      </p>}
 
       <TodoList
         todos={todos}

@@ -2,24 +2,28 @@
 "use client";
 
 import { useState } from "react";
+import type { Priority } from "@/types/todo";
 
 interface AddTodoProps {
-  onAdd: (title: string) => void;
+  onAdd: (title: string, priority: Priority) => boolean;
 }
 
 export default function AddTodo({ onAdd }: AddTodoProps) {
   const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState<Priority>("medium");
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = title.trim();
     if (!trimmed) return;
-    onAdd(trimmed);
-    setTitle("");
+    if (onAdd(trimmed, priority)) {
+      setTitle("");
+      setPriority("medium");
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
       <label htmlFor="new-todo" className="sr-only">
         Add a new todo
       </label>
@@ -30,8 +34,16 @@ export default function AddTodo({ onAdd }: AddTodoProps) {
         onChange={(event) => setTitle(event.target.value)}
         placeholder="What needs to be done?"
         autoComplete="off"
-        className="flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+        className="min-w-0 flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
       />
+      <select aria-label="Priority" value={priority} onChange={(event) => {
+        const value = event.target.value;
+        if (value === "low" || value === "medium" || value === "high") setPriority(value);
+      }} className="rounded-md border border-gray-300 bg-white px-2 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
       <button
         type="submit"
         disabled={title.trim().length === 0}

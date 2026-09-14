@@ -1,5 +1,6 @@
 // #104 — TodoItem component (with #108 deletion support)
 import type { Todo } from "@/types/todo";
+import PriorityBadge from "./PriorityBadge";
 
 interface TodoItemProps {
   todo: Todo;
@@ -31,6 +32,7 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
       >
         {todo.title}
       </label>
+      <PriorityBadge priority={todo.priority ?? "medium"} />
       <button
         type="button"
         onClick={() => onDelete(todo.id)}

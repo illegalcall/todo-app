@@ -1,6 +1,8 @@
 // #103 — Todo type definition + sample data
 
 /** A single todo item in the Daybook app. */
+export type Priority = "low" | "medium" | "high";
+
 export interface Todo {
   /** Stable unique identifier. */
   id: string;
@@ -8,6 +10,7 @@ export interface Todo {
   title: string;
   /** Whether the task has been completed. */
   completed: boolean;
+  priority?: Priority;
 }
 
 /** Seed data used to populate the list on first render. */
