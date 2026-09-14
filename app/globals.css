@@ -813,3 +813,7 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Native modal behavior keeps keyboard focus inside a focus session. */
+dialog.focus-panel { margin: auto; border: 0; color: inherit; }
+dialog.focus-panel::backdrop { background: transparent; }

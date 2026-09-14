@@ -34,11 +34,12 @@ export function loadTodos(): Todo[] | null {
 }
 
 /** Persist todos to localStorage. */
-export function saveTodos(todos: Todo[]): void {
-  if (typeof window === "undefined") return;
+export function saveTodos(todos: Todo[]): boolean {
+  if (typeof window === "undefined") return false;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    return true;
   } catch {
-    // Quota or private mode — fail silently.
+    return false;
   }
 }

@@ -11,7 +11,10 @@ export interface DayContext {
 export function getDayContext(now = new Date()): DayContext {
   const hour = now.getHours();
   const minutes = now.getMinutes();
-  const hourProgress = Math.min(1, Math.max(0, (hour * 60 + minutes) / (24 * 60)));
+  const hourProgress = Math.min(
+    1,
+    Math.max(0, (hour * 60 + minutes) / (24 * 60)),
+  );
 
   let phase: DayPhase;
   let greeting: string;
@@ -42,4 +45,29 @@ export function formatCountdown(totalSeconds: number): string {
   const minutes = Math.floor(safe / 60);
   const seconds = safe % 60;
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
+/** Stable minute snapshot for the client clock; the server uses a neutral view. */
+export function clockSnapshot(): number {
+  return Math.floor(Date.now() / 60_000) * 60_000;
+}
+
+/** Keep the initial server and client output identical during hydration. */
+export function serverClockSnapshot(): number {
+  return 0;
+}
+
+/** Catch up after background throttling as well as during a visible minute tick. */
+export function subscribeClock(listener: () => void): () => void {
+  const timer = window.setInterval(listener, 60_000);
+  document.addEventListener("visibilitychange", listener);
+  return () => {
+    window.clearInterval(timer);
+    document.removeEventListener("visibilitychange", listener);
+  };
+}
+
+/** Measure remaining wall-clock time, even if interval callbacks were delayed. */
+export function remainingFocusMs(deadline: number, now: number): number {
+  return Math.max(0, deadline - now);
 }

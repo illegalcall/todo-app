@@ -8,7 +8,7 @@ interface TodoListProps {
   onUpdate: (
     id: string,
     patch: Partial<Pick<Todo, "title" | "priority" | "dueTime">>,
-  ) => void;
+  ) => boolean;
   onFocus: (id: string) => void;
   focusedId: string | null;
 }

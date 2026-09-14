@@ -5,7 +5,7 @@ import type { Priority } from "@/types/todo";
 import { PRIORITY_LABELS } from "@/types/todo";
 
 interface AddTodoProps {
-  onAdd: (title: string, priority: Priority, dueTime?: string) => void;
+  onAdd: (title: string, priority: Priority, dueTime?: string) => boolean;
 }
 
 export default function AddTodo({ onAdd }: AddTodoProps) {
@@ -17,10 +17,11 @@ export default function AddTodo({ onAdd }: AddTodoProps) {
     event.preventDefault();
     const trimmed = title.trim();
     if (!trimmed) return;
-    onAdd(trimmed, priority, dueTime || undefined);
-    setTitle("");
-    setDueTime("");
-    setPriority("next");
+    if (onAdd(trimmed, priority, dueTime || undefined)) {
+      setTitle("");
+      setDueTime("");
+      setPriority("next");
+    }
   }
 
   return (
@@ -48,7 +49,11 @@ export default function AddTodo({ onAdd }: AddTodoProps) {
       </div>
 
       <div className="composer__meta">
-        <div className="composer__priorities" role="group" aria-label="Priority">
+        <div
+          className="composer__priorities"
+          role="group"
+          aria-label="Priority"
+        >
           {(Object.keys(PRIORITY_LABELS) as Priority[]).map((key) => (
             <button
               key={key}
