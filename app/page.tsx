@@ -2,7 +2,7 @@
 // #108 — Todo deletion  |  #109 — Todo count summary
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Todo } from "@/types/todo";
 import { sampleTodos } from "@/types/todo";
 import AddTodo from "@/components/AddTodo";
@@ -32,6 +32,10 @@ export default function Home() {
 
   // #109 — count summary
   const activeCount = todos.filter((todo) => !todo.completed).length;
+
+  useEffect(() => {
+    document.title = `(${activeCount}) Todos`;
+  }, [activeCount]);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">

@@ -13,7 +13,6 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Daybook",
   description: "A simple todo app to track what needs doing today.",
 };
 
