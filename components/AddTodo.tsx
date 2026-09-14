@@ -30,12 +30,12 @@ export default function AddTodo({ onAdd }: AddTodoProps) {
         onChange={(event) => setTitle(event.target.value)}
         placeholder="What needs to be done?"
         autoComplete="off"
-        className="flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+        className="min-w-0 flex-1 rounded-xl border border-[var(--line-strong)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--ink)] shadow-sm placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/25"
       />
       <button
         type="submit"
         disabled={title.trim().length === 0}
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+        className="rounded-xl bg-[var(--button-bg)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[var(--button-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50"
       >
         Add
       </button>
