@@ -77,7 +77,8 @@ export function loadTodos(): Todo[] {
 
 /** Persist a mutation and notify subscribers; false leaves user input intact. */
 export function saveTodos(todos: Todo[]): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined" || !todos.every(isTodo) ||
+      new Set(todos.map(todo => todo.id)).size !== todos.length) return false;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
   } catch {

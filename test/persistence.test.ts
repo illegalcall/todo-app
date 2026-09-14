@@ -113,3 +113,11 @@ test("overdue means an unfinished task before the local calendar date", () => {
   assert.equal(isOverdue({ ...todo, dueDate: undefined }, today), false);
   assert.equal(isOverdue(todo, ""), false);
 });
+
+test("unsupported dates cannot replace the persisted list", () => {
+  const storage = installStorage(JSON.stringify([todo]));
+  assert.equal(saveTodos([{ ...todo, dueDate: "10000-01-01" }]), false);
+  assert.deepEqual(JSON.parse(storage.read()!), [todo]);
+  assert.equal(saveTodos([{ ...todo, dueDate: "2026-02-30" }]), false);
+  assert.deepEqual(loadTodos(), [todo]);
+});

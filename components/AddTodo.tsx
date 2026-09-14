@@ -40,7 +40,7 @@ export default function AddTodo({ onAdd }: AddTodoProps) {
       <label className="flex items-center gap-2 text-sm">
         Due date
         <input
-          type="date"
+          type="date" max="9999-12-31"
           value={dueDate}
           onChange={(event) => setDueDate(event.target.value)}
           className="rounded-md border border-gray-300 px-2 py-2 dark:border-gray-600 dark:bg-gray-800"
