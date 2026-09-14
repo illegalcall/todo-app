@@ -7,6 +7,7 @@ interface TodoItemProps {
   onDelete: (id: string) => void;
 }
 
+/** Render a task with its completion, due date, and deletion controls. */
 export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   const labelId = `todo-label-${todo.id}`;
 
@@ -30,6 +31,11 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
         }`}
       >
         {todo.title}
+        {todo.dueDate && (
+          <time dateTime={todo.dueDate} className="ml-2 text-xs text-gray-500">
+            {" "}Due {todo.dueDate}
+          </time>
+        )}
       </label>
       <button
         type="button"
