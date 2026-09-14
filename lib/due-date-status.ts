@@ -1,15 +1,8 @@
-"use client";
+export function getDueDateStatus(dueDate: string, completed: boolean, todayKey: string) {
+  if (completed) return { label: formatDate(dueDate), className: "text-gray-400 line-through" };
 
-interface DueDateBadgeProps {
-  dueDate: string;
-  completed: boolean;
-}
-
-function getDueDateStatus(dueDate: string, completed: boolean) {
-  if (completed) return { label: formatDate(dueDate), className: "text-foreground/40 line-through" };
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  if (!todayKey) return { label: formatDate(dueDate), className: "text-gray-500" };
+  const today = new Date(todayKey + "T00:00:00");
   const due = new Date(dueDate + "T00:00:00");
   const diffDays = Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -22,7 +15,7 @@ function getDueDateStatus(dueDate: string, completed: boolean) {
   if (diffDays <= 3) {
     return { label: `Due in ${diffDays}d · ${formatDate(dueDate)}`, className: "text-yellow-600 dark:text-yellow-400" };
   }
-  return { label: formatDate(dueDate), className: "text-foreground/50" };
+  return { label: formatDate(dueDate), className: "text-gray-500" };
 }
 
 function formatDate(dateStr: string) {
@@ -30,11 +23,3 @@ function formatDate(dateStr: string) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-export default function DueDateBadge({ dueDate, completed }: DueDateBadgeProps) {
-  const { label, className } = getDueDateStatus(dueDate, completed);
-  return (
-    <span className={`text-xs ${className}`}>
-      {label}
-    </span>
-  );
-}
