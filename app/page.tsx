@@ -30,6 +30,14 @@ export default function Home() {
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
   }
 
+  function handleRename(id: string, title: string) {
+    const trimmed = title.trim();
+    if (!trimmed) return;
+    setTodos((prev) =>
+      prev.map((todo) => todo.id === id ? { ...todo, title: trimmed } : todo),
+    );
+  }
+
   // #109 — count summary
   const activeCount = todos.filter((todo) => !todo.completed).length;
 
@@ -52,6 +60,7 @@ export default function Home() {
         todos={todos}
         onToggle={handleToggle}
         onDelete={handleDelete}
+        onRename={handleRename}
       />
 
       <p
