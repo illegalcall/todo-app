@@ -2,36 +2,81 @@
 // #108 — Todo deletion  |  #109 — Todo count summary
 "use client";
 
-import { useState } from "react";
-import type { Todo } from "@/types/todo";
-import { sampleTodos } from "@/types/todo";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import type { Todo, TodoFilter } from "@/types/todo";
+import {
+  loadTodos,
+  parseTodos,
+  readTodosSnapshot,
+  saveTodos,
+  serverTodosSnapshot,
+  subscribeTodos,
+} from "@/lib/storage";
+import ClearCompleted from "@/components/ClearCompleted";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
+import TodoFilters, { filterTabId } from "@/components/TodoFilters";
 
+/** Render the persisted todo list and its date-aware summary. */
 export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+  const snapshot = useSyncExternalStore(
+    subscribeTodos,
+    readTodosSnapshot,
+    serverTodosSnapshot,
+  );
+  const todos = useMemo(() => parseTodos(snapshot), [snapshot]);
+  const failedEdits = useRef(new Set<string>());
+  const [filter, setFilter] = useState<TodoFilter>("all");
+  const [saveError, setSaveError] = useState(false);
 
-  function handleAdd(title: string) {
-    setTodos((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), title, completed: false },
+  function updateTodos(update: (previous: Todo[]) => Todo[]): boolean {
+    const saved = saveTodos(update(loadTodos()));
+    setSaveError(!saved);
+    return saved;
+  }
+
+  function handleAdd(title: string): boolean {
+    return updateTodos((previous) => [
+      ...previous,
+      {
+        id: crypto.randomUUID(),
+        title,
+        completed: false,
+      },
     ]);
   }
 
   function handleToggle(id: string) {
-    setTodos((prev) =>
+    if (failedEdits.current.has(id) && filter !== "all") return;
+    const saved = updateTodos((prev) =>
       prev.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo,
       ),
     );
+    if (saved && filter !== "all") document.getElementById(filterTabId(filter))?.focus();
   }
 
   function handleDelete(id: string) {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    if (updateTodos((prev) => prev.filter((todo) => todo.id !== id)) && failedEdits.current.has(id)) failedEdits.current.delete(id);
+  }
+
+  function handleRename(id: string, title: string): boolean {
+    const saved = updateTodos(previous => previous.map(todo => todo.id === id ? { ...todo, title } : todo));
+    if (saved) failedEdits.current.delete(id);
+    else failedEdits.current.add(id);
+    return saved;
   }
 
   // #109 — count summary
   const activeCount = todos.filter((todo) => !todo.completed).length;
+
+  useEffect(() => {
+    const visible = new Set(todos.filter(todo => filter === "all" ||
+      (filter === "completed" ? todo.completed : !todo.completed)).map(todo => todo.id));
+    for (const id of failedEdits.current) if (!visible.has(id)) failedEdits.current.delete(id);
+  }, [todos, filter]);
+
+  useEffect(() => { document.title = `(${activeCount}) Todos`; }, [activeCount]);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">
@@ -48,11 +93,30 @@ export default function Home() {
         <AddTodo onAdd={handleAdd} />
       </div>
 
-      <TodoList
-        todos={todos}
-        onToggle={handleToggle}
-        onDelete={handleDelete}
-      />
+
+
+      <div className="mb-4">
+        <TodoFilters filter={filter} onFilterChange={next => { if (failedEdits.current.size === 0) setFilter(next); }} panelId="todo-panel"
+          counts={{ all: todos.length, active: activeCount, completed: todos.length - activeCount }} />
+      </div>
+      <div id="todo-panel" role="tabpanel" aria-labelledby={filterTabId(filter)} tabIndex={0}>
+        <TodoList todos={todos.filter(todo => filter === "all" || (filter === "completed" ? todo.completed : !todo.completed))}
+          onToggle={handleToggle} onDelete={handleDelete} onRename={handleRename} onCancelRename={id => { failedEdits.current.delete(id); }} />
+      </div>
+
+      {todos.some((todo) => todo.completed) && (
+        <div className="mt-4">
+          <ClearCompleted
+            onClear={() => {
+              const saved = updateTodos((previous) => previous.filter((todo) => !todo.completed));
+              if (saved) {
+                const remaining = new Set(loadTodos().map(todo => todo.id));
+                for (const id of failedEdits.current) if (!remaining.has(id)) failedEdits.current.delete(id);
+              }
+            }}
+          />
+        </div>
+      )}
 
       <p
         className="mt-6 text-sm text-gray-500 dark:text-gray-400"
@@ -66,6 +130,11 @@ export default function Home() {
           </span>
         )}
       </p>
+      {saveError && (
+        <p role="alert" className="mt-4 text-sm text-red-600">
+          Could not save your changes. Check browser storage and try again.
+        </p>
+      )}
     </main>
   );
 }
