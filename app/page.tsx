@@ -1,76 +1,71 @@
+// #107 — Main page wiring with state management
+// #108 — Todo deletion  |  #109 — Todo count summary
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-
-const subscribe = () => () => {};
-const getIsMac = () =>
-  typeof navigator !== "undefined" &&
-  /Mac|iPhone|iPad|iPod/.test(navigator.platform);
-const getServerIsMac = () => false;
+import { useState } from "react";
+import type { Todo } from "@/types/todo";
+import { sampleTodos } from "@/types/todo";
+import AddTodo from "@/components/AddTodo";
+import TodoList from "@/components/TodoList";
 
 export default function Home() {
-  const [todos, setTodos] = useState<string[]>([]);
-  const [input, setInput] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const isMac = useSyncExternalStore(subscribe, getIsMac, getServerIsMac);
-  const shortcutKey = isMac ? "⌘K" : "Ctrl+K";
+  const [todos, setTodos] = useState<Todo[]>(sampleTodos);
 
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  function addTodo() {
-    const trimmed = input.trim();
-    if (!trimmed) return;
-    setTodos((prev) => [...prev, trimmed]);
-    setInput("");
+  function handleAdd(title: string) {
+    setTodos((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), title, completed: false },
+    ]);
   }
 
-  return (
-    <main className="min-h-screen bg-white p-8 max-w-lg mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Todo List</h1>
+  function handleToggle(id: string) {
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
+  }
 
-      <div className="flex gap-2 mb-6">
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addTodo()}
-          placeholder={`Add a new todo... (${shortcutKey})`}
-          className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
-        />
-        <button
-          onClick={addTodo}
-          className="bg-gray-900 text-white px-4 py-2 rounded text-sm hover:bg-gray-700 transition-colors"
-        >
-          Add
-        </button>
+  function handleDelete(id: string) {
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+  }
+
+  // #109 — count summary
+  const activeCount = todos.filter((todo) => !todo.completed).length;
+
+  return (
+    <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          Daybook
+        </h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Keep track of what needs doing today.
+        </p>
+      </header>
+
+      <div className="mb-6">
+        <AddTodo onAdd={handleAdd} />
       </div>
 
-      {todos.length === 0 ? (
-        <p className="text-gray-500 text-sm">No todos yet. Add one above!</p>
-      ) : (
-        <ul className="space-y-2">
-          {todos.map((todo, i) => (
-            <li
-              key={i}
-              className="border border-gray-200 rounded px-3 py-2 text-sm text-gray-800"
-            >
-              {todo}
-            </li>
-          ))}
-        </ul>
-      )}
+      <TodoList
+        todos={todos}
+        onToggle={handleToggle}
+        onDelete={handleDelete}
+      />
+
+      <p
+        className="mt-6 text-sm text-gray-500 dark:text-gray-400"
+        aria-live="polite"
+      >
+        {activeCount} active
+        {todos.length > 0 && (
+          <span className="text-gray-400 dark:text-gray-500">
+            {" "}
+            &middot; {todos.length} total
+          </span>
+        )}
+      </p>
     </main>
   );
 }
