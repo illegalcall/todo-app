@@ -1,5 +1,5 @@
 // #107 — Main page wiring with state management
-// #108 — Todo deletion  |  #109 — Todo count summary
+// #108 — Todo deletion  |  #109 — Todo count summary  |  #50 — progress display
 "use client";
 
 import { useState } from "react";
@@ -7,6 +7,7 @@ import type { Todo } from "@/types/todo";
 import { sampleTodos } from "@/types/todo";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
+import TodoProgress from "@/components/TodoProgress";
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(sampleTodos);
@@ -47,6 +48,8 @@ export default function Home() {
       <div className="mb-6">
         <AddTodo onAdd={handleAdd} />
       </div>
+
+      <TodoProgress todos={todos} />
 
       <TodoList
         todos={todos}
