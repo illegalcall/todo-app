@@ -41,7 +41,7 @@ export default function TodoItem({
         type="button"
         onClick={() => onDuplicate(todo.id)}
         aria-label={`Duplicate "${todo.title}"`}
-        className="shrink-0 rounded p-1 text-gray-400 transition-colors hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:text-blue-400"
+        className="shrink-0 rounded p-1 text-gray-600 transition-colors hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-300 dark:hover:text-blue-400"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
