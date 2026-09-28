@@ -1,13 +1,19 @@
-// #104 — TodoItem component (with #108 deletion support)
+// #104 — TodoItem component (with #108 deletion support and #64 duplication)
 import type { Todo } from "@/types/todo";
 
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onDuplicate: (id: string) => void;
 }
 
-export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
+export default function TodoItem({
+  todo,
+  onToggle,
+  onDelete,
+  onDuplicate,
+}: TodoItemProps) {
   const labelId = `todo-label-${todo.id}`;
 
   return (
@@ -31,6 +37,23 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
       >
         {todo.title}
       </label>
+      <button
+        type="button"
+        onClick={() => onDuplicate(todo.id)}
+        aria-label={`Duplicate "${todo.title}"`}
+        className="shrink-0 rounded p-1 text-gray-600 transition-colors hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-300 dark:hover:text-blue-400"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          className="h-5 w-5"
+          aria-hidden="true"
+        >
+          <path d="M7 3.5A1.5 1.5 0 0 1 8.5 2h3.879a1.5 1.5 0 0 1 1.06.44l3.122 3.121a1.5 1.5 0 0 1 .439 1.061V12.5A1.5 1.5 0 0 1 15.5 14h-1v-1h1a.5.5 0 0 0 .5-.5V6.621a.5.5 0 0 0-.146-.353l-3.122-3.122A.5.5 0 0 0 12.379 3H8.5a.5.5 0 0 0-.5.5v.5H7v-.5Z" />
+          <path d="M4.5 5A1.5 1.5 0 0 0 3 6.5v8A1.5 1.5 0 0 0 4.5 16h6a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 10.5 5h-6Z" />
+        </svg>
+      </button>
       <button
         type="button"
         onClick={() => onDelete(todo.id)}

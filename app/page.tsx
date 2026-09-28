@@ -1,5 +1,5 @@
 // #107 — Main page wiring with state management
-// #108 — Todo deletion  |  #109 — Todo count summary
+// #108 — Todo deletion  |  #109 — Todo count summary  |  #64 — Todo duplication
 "use client";
 
 import { useState } from "react";
@@ -24,6 +24,21 @@ export default function Home() {
         todo.id === id ? { ...todo, completed: !todo.completed } : todo,
       ),
     );
+  }
+
+  function handleDuplicate(id: string) {
+    setTodos((prev) => {
+      const original = prev.find((todo) => todo.id === id);
+      if (!original) return prev;
+      const index = prev.indexOf(original);
+      const next = [...prev];
+      next.splice(index + 1, 0, {
+        id: crypto.randomUUID(),
+        title: original.title,
+        completed: false,
+      });
+      return next;
+    });
   }
 
   function handleDelete(id: string) {
@@ -52,6 +67,7 @@ export default function Home() {
         todos={todos}
         onToggle={handleToggle}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
       />
 
       <p
