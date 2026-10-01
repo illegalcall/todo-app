@@ -6,10 +6,12 @@ import { useState } from "react";
 import type { Todo } from "@/types/todo";
 import { sampleTodos } from "@/types/todo";
 import AddTodo from "@/components/AddTodo";
+import FilterTabs, { type TodoFilter } from "@/components/FilterTabs";
 import TodoList from "@/components/TodoList";
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+  const [filter, setFilter] = useState<TodoFilter>("all");
 
   function handleAdd(title: string) {
     setTodos((prev) => [
@@ -30,8 +32,21 @@ export default function Home() {
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
   }
 
+  // #273 — filtering
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === "active") return !todo.completed;
+    if (filter === "completed") return todo.completed;
+    return true;
+  });
+
+  const counts: Record<TodoFilter, number> = {
+    all: todos.length,
+    active: todos.filter((todo) => !todo.completed).length,
+    completed: todos.filter((todo) => todo.completed).length,
+  };
+
   // #109 — count summary
-  const activeCount = todos.filter((todo) => !todo.completed).length;
+  const activeCount = counts.active;
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">
@@ -48,8 +63,12 @@ export default function Home() {
         <AddTodo onAdd={handleAdd} />
       </div>
 
+      <div className="mb-4">
+        <FilterTabs filter={filter} onChange={setFilter} counts={counts} />
+      </div>
+
       <TodoList
-        todos={todos}
+        todos={filteredTodos}
         onToggle={handleToggle}
         onDelete={handleDelete}
       />
