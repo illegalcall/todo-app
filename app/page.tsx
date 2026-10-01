@@ -2,14 +2,42 @@
 // #108 — Todo deletion  |  #109 — Todo count summary
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Todo } from "@/types/todo";
 import { sampleTodos } from "@/types/todo";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
 
+const STORAGE_KEY = "daybook.todos";
+
+function loadTodos(): Todo[] {
+  if (typeof window === "undefined") return sampleTodos;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return sampleTodos;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return sampleTodos;
+    return parsed.filter(
+      (t): t is Todo =>
+        typeof t?.id === "string" &&
+        typeof t?.title === "string" &&
+        typeof t?.completed === "boolean",
+    );
+  } catch {
+    return sampleTodos;
+  }
+}
+
 export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+  const [todos, setTodos] = useState<Todo[]>(loadTodos);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    } catch {
+      // ignore quota/serialization errors
+    }
+  }, [todos]);
 
   function handleAdd(title: string) {
     setTodos((prev) => [
