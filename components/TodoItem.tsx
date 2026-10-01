@@ -10,6 +10,23 @@ interface TodoItemProps {
 export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   const labelId = `todo-label-${todo.id}`;
 
+  // Compare calendar dates (not timestamps) so "today" is not flagged overdue.
+  const today = new Date().toISOString().slice(0, 10);
+  const isOverdue =
+    !todo.completed && todo.dueDate !== undefined && todo.dueDate < today;
+  const isDueToday = !todo.completed && todo.dueDate === today;
+
+  const dueLabel = (() => {
+    if (!todo.dueDate) return null;
+    const parsed = new Date(`${todo.dueDate}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return todo.dueDate;
+    return parsed.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  })();
+
   return (
     <li className="flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <input
@@ -31,6 +48,20 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
       >
         {todo.title}
       </label>
+      {dueLabel && (
+        <span
+          className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+            isOverdue
+              ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+              : isDueToday
+                ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          }`}
+        >
+          {isOverdue ? "Overdue · " : isDueToday ? "Due today · " : "Due "}
+          {dueLabel}
+        </span>
+      )}
       <button
         type="button"
         onClick={() => onDelete(todo.id)}
