@@ -9,7 +9,7 @@ export default defineConfig({
     // Serves the production build. Run `pnpm build` first — `next start`
     // fails with a confusing error if no build output exists.
     command:
-      "pnpm build && pnpm run start -- --hostname 127.0.0.1 --port 5215",
+      "pnpm build && pnpm exec next start --hostname 127.0.0.1 --port 5215",
     url: "http://127.0.0.1:5215",
     reuseExistingServer: false,
   },
