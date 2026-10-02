@@ -4,22 +4,25 @@
 import { useState } from "react";
 
 interface AddTodoProps {
-  onAdd: (title: string) => void;
+  onAdd: (title: string, dueDate?: string) => void;
 }
 
 export default function AddTodo({ onAdd }: AddTodoProps) {
   const [title, setTitle] = useState("");
+  const [dueDate, setDueDate] = useState("");
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = title.trim();
     if (!trimmed) return;
-    onAdd(trimmed);
+    onAdd(trimmed, dueDate || undefined);
     setTitle("");
+    setDueDate("");
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+      <div className="flex gap-2">
       <label htmlFor="new-todo" className="sr-only">
         Add a new todo
       </label>
@@ -39,6 +42,17 @@ export default function AddTodo({ onAdd }: AddTodoProps) {
       >
         Add
       </button>
+      </div>
+      <label htmlFor="new-todo-due" className="sr-only">
+        Due date (optional)
+      </label>
+      <input
+        id="new-todo-due"
+        type="date"
+        value={dueDate}
+        onChange={(event) => setDueDate(event.target.value)}
+        className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:[color-scheme:dark]"
+      />
     </form>
   );
 }

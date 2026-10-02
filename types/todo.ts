@@ -1,4 +1,5 @@
 // #103 — Todo type definition + sample data
+// #275/#265 — optional due date field
 
 /** A single todo item in the Daybook app. */
 export interface Todo {
@@ -8,6 +9,8 @@ export interface Todo {
   title: string;
   /** Whether the task has been completed. */
   completed: boolean;
+  /** Optional due date in ISO format (yyyy-mm-dd). */
+  dueDate?: string;
 }
 
 /** Seed data used to populate the list on first render. */
