@@ -29,12 +29,12 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
             : "text-gray-900 dark:text-gray-100"
         }`}
       >
-        {todo.title}
+        {todo.text}
       </label>
       <button
         type="button"
         onClick={() => onDelete(todo.id)}
-        aria-label={`Delete "${todo.title}"`}
+        aria-label={`Delete "${todo.text}"`}
         className="shrink-0 rounded p-1 text-gray-400 transition-colors hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 dark:hover:text-red-400"
       >
         <svg
