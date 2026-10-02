@@ -13,7 +13,7 @@ test("todo additions, completion and deletion survive blog navigation", async ({
   await page.getByRole("link", { name: /How Large Language Models Work/ }).first().click();
   await page.waitForURL("**/blog/how-large-language-models-work");
   await navigation.getByRole("link", { name: "Today", exact: true }).click();
-  await page.waitForURL("http://127.0.0.1:5215/");
+  await page.waitForURL("/");
   await expect(page.getByRole("checkbox", { name: "Keep across articles", exact: true })).toBeChecked();
   await expect(page.getByRole("checkbox", { name: "Take a 20 minute walk", exact: true })).toHaveCount(0);
   await expect(page.getByRole("list", { name: "Todo list" }).getByRole("listitem")).toHaveCount(3);
@@ -21,7 +21,7 @@ test("todo additions, completion and deletion survive blog navigation", async ({
   await navigation.getByRole("link", { name: "Field notes", exact: true }).click();
   await page.waitForURL("**/blog");
   await page.goBack();
-  await page.waitForURL("http://127.0.0.1:5215/");
+  await page.waitForURL("/");
   await expect(page.getByRole("checkbox", { name: "Keep across articles", exact: true })).toBeChecked();
 });
 
