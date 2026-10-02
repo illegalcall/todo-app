@@ -44,7 +44,7 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
         {todo.title}
         {todo.dueDate && (
           <span
-            className={`ml-2 text-xs ${
+            className={`ml-2 no-underline text-xs ${
               todo.completed
                 ? "text-gray-400 dark:text-gray-500"
                 : "text-gray-500 dark:text-gray-400"
