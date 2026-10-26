@@ -1,10 +1,22 @@
-// #104 — TodoItem component (with #108 deletion support)
+// #104 — TodoItem component (with #108 deletion support, #275 due date display)
 import type { Todo } from "@/types/todo";
 
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+}
+
+/** Format an ISO `YYYY-MM-DD` date for display without timezone drift. */
+function formatDueDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  if (!year || !month || !day) return isoDate;
+  const date = new Date(year, month - 1, day);
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
@@ -30,6 +42,17 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
         }`}
       >
         {todo.title}
+        {todo.dueDate && (
+          <span
+            className={`ml-2 no-underline text-xs ${
+              todo.completed
+                ? "text-gray-400 dark:text-gray-500"
+                : "text-gray-500 dark:text-gray-400"
+            }`}
+          >
+            Due {formatDueDate(todo.dueDate)}
+          </span>
+        )}
       </label>
       <button
         type="button"
