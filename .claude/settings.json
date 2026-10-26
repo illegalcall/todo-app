@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": ["Bash(touch:*)", "Bash(git commit:*)", "Bash(rm:*)", "Edit", "Write", "WebFetch"]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {"hooks": [{"type": "command", "command": "echo \"prompt-hook review=${AO_REVIEW_SESSION_ID:-none} worker=${AO_SESSION_ID:-none}\" >> /tmp/rcqa-project-hook.txt"}]}
+    ],
+    "PreToolUse": [
+      {"hooks": [{"type": "command", "command": "echo \"pretool-hook review=${AO_REVIEW_SESSION_ID:-none} worker=${AO_SESSION_ID:-none}\" >> /tmp/rcqa-project-hook.txt"}]}
+    ]
+  }
+}
