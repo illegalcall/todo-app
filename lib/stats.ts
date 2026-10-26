@@ -9,5 +9,5 @@ export function completionRate(todos: Todo[]): number {
 
 /** Todos that still need doing, oldest first. */
 export function remaining(todos: Todo[]): Todo[] {
-  return todos.filter((todo) => !todo.completed).reverse();
+  return todos.filter((todo) => !todo.completed);
 }
