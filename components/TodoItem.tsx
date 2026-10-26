@@ -10,8 +10,20 @@ interface TodoItemProps {
 export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   const labelId = `todo-label-${todo.id}`;
 
+  // #275 — overdue only matters for incomplete todos with a due date.
+  const isOverdue =
+    !todo.completed &&
+    !!todo.dueDate &&
+    new Date(`${todo.dueDate}T23:59:59`) < new Date();
+
   return (
-    <li className="flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <li
+      className={`flex items-center gap-3 rounded-md border bg-white px-3 py-2 shadow-sm dark:bg-gray-800 ${
+        isOverdue
+          ? "border-red-400 dark:border-red-600"
+          : "border-gray-200 dark:border-gray-700"
+      }`}
+    >
       <input
         id={`todo-${todo.id}`}
         type="checkbox"
@@ -31,6 +43,22 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
       >
         {todo.title}
       </label>
+      {todo.dueDate && (
+        <time
+          dateTime={todo.dueDate}
+          className={`shrink-0 text-xs ${
+            isOverdue
+              ? "font-medium text-red-600 dark:text-red-400"
+              : "text-gray-500 dark:text-gray-400"
+          }`}
+        >
+          Due{" "}
+          {new Date(`${todo.dueDate}T00:00:00`).toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+          })}
+        </time>
+      )}
       <button
         type="button"
         onClick={() => onDelete(todo.id)}
