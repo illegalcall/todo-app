@@ -11,10 +11,10 @@ import TodoList from "@/components/TodoList";
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(sampleTodos);
 
-  function handleAdd(title: string) {
+  function handleAdd(text: string) {
     setTodos((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), title, completed: false },
+      { id: crypto.randomUUID(), text, completed: false },
     ]);
   }
 
