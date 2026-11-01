@@ -1,4 +1,5 @@
 // #104 — TodoItem component (with #108 deletion support)
+import { useSyncExternalStore } from "react";
 import type { Todo } from "@/types/todo";
 
 interface TodoItemProps {
@@ -7,8 +8,37 @@ interface TodoItemProps {
   onDelete: (id: string) => void;
 }
 
+const emptySubscribe = () => () => {};
+/** False during SSR/prerender, true once running on the client. */
+const useMounted = () =>
+  useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+
 export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   const labelId = `todo-label-${todo.id}`;
+
+  // The formatted date and overdue flag depend on the visitor's locale and
+  // calendar day, so they are only computed after mount on the client.
+  // Rendering nothing on the server keeps the prerendered HTML free of
+  // machine-local dates and avoids hydration mismatches.
+  const mounted = useMounted();
+
+  let dueInfo: { text: string; overdue: boolean } | null = null;
+  if (mounted && todo.dueDate) {
+    const due = new Date(`${todo.dueDate}T00:00:00`);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    dueInfo = {
+      text: due.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      }),
+      overdue: !todo.completed && due < today,
+    };
+  }
 
   return (
     <li className="flex items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -31,6 +61,18 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
       >
         {todo.title}
       </label>
+      {dueInfo && (
+        <time
+          dateTime={todo.dueDate}
+          className={`shrink-0 text-xs ${
+            dueInfo.overdue
+              ? "font-medium text-red-600 dark:text-red-400"
+              : "text-gray-500 dark:text-gray-400"
+          }`}
+        >
+          Due {dueInfo.text}
+        </time>
+      )}
       <button
         type="button"
         onClick={() => onDelete(todo.id)}
