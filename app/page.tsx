@@ -5,11 +5,14 @@
 import { useState } from "react";
 import type { Todo } from "@/types/todo";
 import { sampleTodos } from "@/types/todo";
+import type { Filter } from "@/types/filter";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
+import FilterTabs from "@/components/FilterTabs";
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+  const [filter, setFilter] = useState<Filter>("all");
 
   function handleAdd(title: string) {
     setTodos((prev) => [
@@ -33,6 +36,12 @@ export default function Home() {
   // #109 — count summary
   const activeCount = todos.filter((todo) => !todo.completed).length;
 
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === "active") return !todo.completed;
+    if (filter === "completed") return todo.completed;
+    return true;
+  });
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-4 py-10">
       <header className="mb-6">
@@ -48,8 +57,10 @@ export default function Home() {
         <AddTodo onAdd={handleAdd} />
       </div>
 
+      <FilterTabs filter={filter} onChange={setFilter} />
+
       <TodoList
-        todos={todos}
+        todos={filteredTodos}
         onToggle={handleToggle}
         onDelete={handleDelete}
       />
