@@ -2,14 +2,51 @@
 // #108 — Todo deletion  |  #109 — Todo count summary
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Todo } from "@/types/todo";
 import { sampleTodos } from "@/types/todo";
 import AddTodo from "@/components/AddTodo";
 import TodoList from "@/components/TodoList";
 
+const STORAGE_KEY = "daybook:todos";
+
+function isTodoArray(value: unknown): value is Todo[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (item) =>
+        typeof item === "object" &&
+        item !== null &&
+        typeof (item as Todo).id === "string" &&
+        typeof (item as Todo).title === "string" &&
+        typeof (item as Todo).completed === "boolean",
+    )
+  );
+}
+
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(sampleTodos);
+
+  // Load any persisted todos after mount, once window/localStorage exist.
+  // Renders sampleTodos first (matching SSR output), then swaps in the
+  // stored todos — avoids a hydration mismatch at the cost of one extra
+  // render when stored data differs from the sample seed.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const parsed: unknown = raw ? JSON.parse(raw) : null;
+      if (isTodoArray(parsed) && parsed.length > 0) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from localStorage on mount
+        setTodos(parsed);
+      }
+    } catch {
+      // Malformed JSON or inaccessible storage — keep the sample todos.
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+  }, [todos]);
 
   function handleAdd(title: string) {
     setTodos((prev) => [
